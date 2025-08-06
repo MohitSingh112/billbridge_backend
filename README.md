@@ -63,7 +63,7 @@ POST /api/auth/login
 
 ---
 
-##👥 Groups
+## 👥 Groups
 
 - POST   `/api/groups/create`
 - POST   `/api/groups/{groupId}/add-user`
