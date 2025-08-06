@@ -72,5 +72,51 @@ public class ExpenseService {
                 .orElseThrow(() -> new RuntimeException("Group not found"));
         return expenseRepo.findByGroup(group);
     }
+
+    public Expense addCustomSplitExpense(Long groupId, String description, Double amount,
+                                         User paidBy, Map<Long, Double> owedUserIdToAmount) {
+        Group group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        if (!group.getMembers().contains(paidBy)) {
+            throw new RuntimeException("You are not a member of this group");
+        }
+
+        double total = owedUserIdToAmount.values().stream().mapToDouble(Double::doubleValue).sum();
+        if (Math.abs(total - amount) > 0.01) {
+            throw new RuntimeException("Split amounts do not match total expense");
+        }
+
+        Expense expense = new Expense();
+        expense.setDescription(description);
+        expense.setAmount(amount);
+        expense.setPaidBy(paidBy);
+        expense.setGroup(group);
+        expense = expenseRepo.save(expense);
+
+        List<Split> splits = new ArrayList<>();
+        for (Map.Entry<Long, Double> entry : owedUserIdToAmount.entrySet()) {
+            Long userId = entry.getKey();
+            Double splitAmount = entry.getValue();
+
+            User user = userRepo.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            if (!group.getMembers().contains(user)) {
+                throw new RuntimeException("User not in group");
+            }
+
+            Split split = new Split();
+            split.setAmount(splitAmount);
+            split.setOwedBy(user);
+            split.setExpense(expense);
+
+            splits.add(split);
+        }
+
+        splitRepo.saveAll(splits);
+        return expense;
+    }
+
 }
 

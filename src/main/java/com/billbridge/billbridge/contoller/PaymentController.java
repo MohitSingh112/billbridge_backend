@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
@@ -20,6 +22,11 @@ public class PaymentController {
                                             @RequestParam Long paidTo,
                                             @RequestParam Double amount) {
         return ResponseEntity.ok(paymentService.settleUp(paidBy, paidTo, amount));
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<Payment>> paymentHistory(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(paymentService.getMyPayments(user));
     }
 }
 

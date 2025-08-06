@@ -10,4 +10,7 @@ import java.util.Optional;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByFromUserOrToUser(User fromUser, User toUser);
+
+    List<Payment> findByPaidByOrPaidTo(User paidBy, User paidTo);
+
 }

@@ -1,5 +1,6 @@
 package com.billbridge.billbridge.contoller;
 
+import com.billbridge.billbridge.dto.CustomSplitRequest;
 import com.billbridge.billbridge.model.Expense;
 import com.billbridge.billbridge.model.User;
 import com.billbridge.billbridge.services.ExpenseService;
@@ -9,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/expenses")
@@ -32,4 +34,16 @@ public class ExpenseController {
     public ResponseEntity<List<Expense>> getExpenses(@PathVariable Long groupId) {
         return ResponseEntity.ok(expenseService.getExpensesByGroup(groupId));
     }
+
+    @PostMapping("/custom")
+    public ResponseEntity<Expense> addCustomSplitExpense(@RequestParam Long groupId,
+                                                         @RequestParam String description,
+                                                         @RequestParam Double amount,
+                                                         @RequestBody CustomSplitRequest request,
+                                                         @AuthenticationPrincipal User paidBy) {
+        return ResponseEntity.ok(
+                expenseService.addCustomSplitExpense(groupId, description, amount, paidBy, request.getSplits())
+        );
+    }
+
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,10 @@ public class PaymentService {
                 .build();
 
         return paymentRepo.save(payment);
+    }
+
+    public List<Payment> getMyPayments(User user) {
+        return paymentRepo.findByPaidByOrPaidTo(user, user);
     }
 }
 
